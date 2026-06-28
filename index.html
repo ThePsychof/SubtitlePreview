@@ -1,123 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subtitle Preview</title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>SubtitlePreview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Preview subtitle styles in a realistic movie frame before rendering to video." />
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="app">
 
-<div class="container">
-
-    <header>
-        <h1>🎬 Subtitle Preview</h1>
+    <!-- Landing -->
+    <header class="landing" id="landing">
+      <div class="landing-inner">
+        <div class="branding">
+          <img src="assets/logo.svg" alt="SubtitlePreview logo" class="logo" />
+          <div class="branding-text">
+            <h1 class="app-title">SubtitlePreview</h1>
+            <p class="app-tagline">
+              Preview subtitle styles in a realistic movie frame—before hardsubbing.
+            </p>
+          </div>
+        </div>
+        <button class="primary-btn" id="startEditingBtn" type="button">
+          Start Editing
+        </button>
+      </div>
+      <footer class="footer">
+        <a href="https://github.com/your-username/SubtitlePreview" target="_blank" rel="noopener noreferrer">
+          View on GitHub
+        </a>
+      </footer>
     </header>
 
-    <main>
-
-        <!-- LEFT PANEL -->
-
-        <section class="controls">
-
-            <h2>Subtitle Settings</h2>
-
-            <div class="group">
-
-                <label for="subtitleText">Subtitle Text</label>
-
-                <textarea id="subtitleText" rows="4">
-                This is what your subtitle will look like.
-                </textarea>
-
+    <!-- Editor -->
+    <main class="editor" id="editor" aria-label="Subtitle style editor">
+      <!-- Preview -->
+      <section class="preview-section">
+        <div class="preview-frame-wrapper">
+          <div class="preview-frame" id="previewFrame" aria-label="Movie frame preview">
+            <img
+              src="assets/movie-default.jpg"
+              alt="Default movie frame"
+              class="preview-image"
+              id="previewImage"
+            />
+            <div class="subtitle-overlay">
+              <p class="subtitle-text" id="subtitleText">
+                Sample subtitle text goes here.
+              </p>
             </div>
-
-            <div class="group">
-
-                <label for="fontFamily">Font Family</label>
-
-                <select id="fontFamily">
-
-                    <option>Arial</option>
-                    <option>Verdana</option>
-                    <option>Tahoma</option>
-                    <option>Trebuchet MS</option>
-                    <option>Georgia</option>
-                    <option>Times New Roman</option>
-                    <option>Courier New</option>
-
-                </select>
-
+            <div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+              <span>Drop image to update frame</span>
             </div>
+          </div>
+        </div>
 
-            <div class="group">
+        <div class="image-controls">
+          <label for="imageUpload" class="image-upload-label">
+            <span>Movie frame image</span>
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              aria-label="Upload movie frame image"
+            />
+          </label>
+          <button type="button" class="secondary-btn" id="resetImageBtn">
+            Reset frame
+          </button>
+        </div>
+      </section>
 
-                <label for="fontSize">
-                    Font Size:
-                    <span id="fontSizeValue">22 px</span>
-                </label>
+      <!-- Controls -->
+      <section class="controls-section" id="controlsSection" aria-label="Subtitle style controls">
+        <h2 class="controls-title">Subtitle style</h2>
 
-                <input
-                    type="range"
-                    id="fontSize"
-                    min="10"
-                    max="80"
-                    value="22">
+        <form class="controls-form" autocomplete="off">
+          <!-- Preview text -->
+          <div class="form-group">
+            <label for="textInput">Preview text</label>
+            <textarea
+              id="textInput"
+              rows="3"
+              aria-label="Subtitle preview text"
+            >Sample subtitle text goes here.</textarea>
+          </div>
 
-            </div>
+          <!-- Font family -->
+          <div class="form-group">
+            <label for="fontSelect">Font family</label>
+            <select id="fontSelect" aria-label="Subtitle font family">
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="Helvetica, sans-serif">Helvetica</option>
+              <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+              <option value="'Segoe UI', sans-serif">Segoe UI</option>
+              <option value="'Times New Roman', serif">Times New Roman</option>
+              <option value="'Georgia', serif">Georgia</option>
+              <option value="'Courier New', monospace">Courier New</option>
+            </select>
+          </div>
 
-            <div class="group">
+          <!-- ASS-like font size (one number) -->
+          <div class="form-group">
+            <label for="subtitleSizeInput">Font size</label>
+            <input
+              type="number"
+              id="subtitleSizeInput"
+              min="1"
+              value="22"
+              aria-label="Subtitle font size"
+            />
+          </div>
 
-                <label for="fontColor">Subtitle Color</label>
+          <!-- Font color -->
+          <div class="form-group">
+            <label for="fontColorInput">Font color</label>
+            <input
+              type="color"
+              id="fontColorInput"
+              value="#ffffff"
+              aria-label="Subtitle font color"
+            />
+          </div>
 
-                <input
-                    type="color"
-                    id="fontColor"
-                    value="#ffff00">
-
-            </div>
-
-            <hr>
-
-            <h2>Background</h2>
-
-            <div class="group">
-
-                <label for="backgroundUpload">Upload Movie Frame</label>
-
-                <input
-                    type="file"
-                    id="backgroundUpload"
-                    accept="image/*">
-
-            </div>
-
-            <button id="resetBackground">
-                Remove Background
+          <!-- Share -->
+          <div class="share-group">
+            <button type="button" class="primary-btn" id="shareBtn">
+              Copy Share Link
             </button>
+            <span class="share-status" id="shareStatus" aria-live="polite"></span>
+          </div>
+        </form>
+      </section>
 
-        </section>
-
-        <!-- RIGHT PANEL -->
-
-        <section class="previewSection">
-
-            <div id="preview">
-
-                <div id="subtitle">
-                    This is what your subtitle will look like.
-                </div>
-
-            </div>
-
-        </section>
-
+      <!-- Floating edit button (preview mode) -->
+      <button
+        type="button"
+        class="floating-edit-btn"
+        id="floatingEditBtn"
+        aria-label="Edit subtitle style"
+      >
+        Edit
+      </button>
     </main>
+  </div>
 
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>

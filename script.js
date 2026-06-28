@@ -1,299 +1,234 @@
-// =====================================
-// Subtitle Preview
-// Part 1
-// =====================================
+// SubtitlePreview – ASS-like subtitle preview with a single font size input
 
-// ---------- Elements ----------
+const landingSection = document.getElementById("landing");
+const editorSection = document.getElementById("editor");
+const startEditingBtn = document.getElementById("startEditingBtn");
 
-const subtitle = document.getElementById("subtitle");
-const preview = document.getElementById("preview");
+const previewFrame = document.getElementById("previewFrame");
+const previewImage = document.getElementById("previewImage");
+const dropOverlay = document.getElementById("dropOverlay");
+const imageUploadInput = document.getElementById("imageUpload");
+const resetImageBtn = document.getElementById("resetImageBtn");
 
-const subtitleText = document.getElementById("subtitleText");
+const subtitleTextEl = document.getElementById("subtitleText");
+const controlsSection = document.getElementById("controlsSection");
 
-const fontFamily = document.getElementById("fontFamily");
+const textInput = document.getElementById("textInput");
+const fontSelect = document.getElementById("fontSelect");
+const subtitleSizeInput = document.getElementById("subtitleSizeInput");
+const fontColorInput = document.getElementById("fontColorInput");
 
-const fontSize = document.getElementById("fontSize");
+const shareBtn = document.getElementById("shareBtn");
+const shareStatus = document.getElementById("shareStatus");
+const floatingEditBtn = document.getElementById("floatingEditBtn");
 
-const fontSizeValue = document.getElementById("fontSizeValue");
+const DEFAULT_IMAGE_SRC = "assets/movie-default.jpg";
 
-const fontColor = document.getElementById("fontColor");
+// Navigation
+function showEditor() {
+  landingSection.classList.add("hidden");
+  editorSection.style.display = "block";
 
-const backgroundUpload =
-    document.getElementById("backgroundUpload");
-
-const resetBackground =
-    document.getElementById("resetBackground");
-
-// ---------- Defaults ----------
-
-const defaults = {
-
-    text:
-        "This is what your subtitle will look like.",
-
-    font:
-        "Arial",
-
-    size:
-        22,
-
-    color:
-        "#ffff00"
-
-};
-
-// =====================================
-// Subtitle
-// =====================================
-
-function updateSubtitleText(){
-
-    subtitle.textContent =
-        subtitleText.value;
-
+  requestAnimationFrame(() => {
+    updateSubtitleFontSize();
+  });
 }
 
-function updateFontFamily(){
-
-    subtitle.style.fontFamily =
-        fontFamily.value;
-
-}
-
-function updateFontSize(){
-
-    subtitle.style.fontSize =
-        fontSize.value + "px";
-
-    fontSizeValue.textContent =
-        fontSize.value + " px";
-
-}
-
-function updateFontColor(){
-
-    subtitle.style.color =
-        fontColor.value;
-
-}
-
-// =====================================
-// Apply Everything
-// =====================================
-
-function refresh(){
-
-    updateSubtitleText();
-
-    updateFontFamily();
-
-    updateFontSize();
-
-    updateFontColor();
-
-}
-
-// =====================================
-// Events
-// =====================================
-
-subtitleText.addEventListener(
-
-    "input",
-
-    refresh
-
-);
-
-
-fontFamily.addEventListener(
-
-    "change",
-
-    refresh
-
-);
-
-fontSize.addEventListener(
-
-    "input",
-
-    refresh
-
-);
-
-fontColor.addEventListener(
-
-    "input",
-
-    refresh
-
-);
-
-// =====================================
-// Background Upload
-// =====================================
-
-function loadBackground(file){
-
-    if(!file){
-
-        return;
-
-    }
-
-    const reader =
-        new FileReader();
-
-    reader.onload = function(event){
-
-        preview.style.backgroundImage =
-            url("${event.target.result}");
-
-    };
-
-    reader.readAsDataURL(file);
-
-}
-
-backgroundUpload.addEventListener(
-
-    "change",
-
-    function(){
-
-        const file =
-            this.files[0];
-
-        loadBackground(file);
-
-    }
-
-);
-// =====================================
-// Part 2
-// =====================================
-
-// ---------- Remove Background ----------
-
-function removeBackground() {
-
-    preview.style.backgroundImage = "none";
-
-    backgroundUpload.value = "";
-
-}
-
-resetBackground.addEventListener(
-
-    "click",
-
-    removeBackground
-
-);
-
-// ---------- Reset Everything ----------
-
-function resetDefaults() {
-
-    subtitleText.value =
-        defaults.text;
-
-    fontFamily.value =
-        defaults.font;
-
-    fontSize.value =
-        defaults.size;
-
-    fontColor.value =
-        defaults.color;
-
-    removeBackground();
-
-    refresh();
-
-}
-
-// =====================================
-// Drag & Drop Support
-// =====================================
-
-preview.addEventListener("dragover", function (e) {
-
-    e.preventDefault();
-
+startEditingBtn.addEventListener("click", () => {
+  showEditor();
 });
 
-preview.addEventListener("drop", function (e) {
+// Subtitle text & font
+function updateSubtitleText(value) {
+  subtitleTextEl.textContent = value || "";
+}
 
-    e.preventDefault();
+function updateSubtitleFontFamily(value) {
+  subtitleTextEl.style.fontFamily = value;
+}
 
-    const file = e.dataTransfer.files[0];
+function updateSubtitleFontColor(value) {
+  subtitleTextEl.style.color = value;
+}
 
-    if (!file) return;
+textInput.addEventListener("input", (e) => {
+  updateSubtitleText(e.target.value);
+});
 
-    if (!file.type.startsWith("image/")) return;
+fontSelect.addEventListener("change", (e) => {
+  updateSubtitleFontFamily(e.target.value);
+});
 
-    loadBackground(file);
-
+fontColorInput.addEventListener("input", (e) => {
+  updateSubtitleFontColor(e.target.value);
 });
 
 // =====================================
-// Paste Image (Ctrl + V)
+// REALISTIC FONT SIZE FIX (based on your CSS)
 // =====================================
+const BASE_PREVIEW_HEIGHT = 450;
+const BASE_SUBTITLE_SCALE = 1;
 
-window.addEventListener("paste", function (e) {
+function updateSubtitleFontSize() {
+    const size = Number(subtitleSizeInput.value);
+    const height = previewFrame.clientHeight;
 
-    const items = e.clipboardData.items;
+    const scale = height / BASE_PREVIEW_HEIGHT;
+    const cssSize = size * scale;
 
-    for (let i = 0; i < items.length; i++) {
 
-        const item = items[i];
+    subtitleTextEl.style.fontSize = cssSize + "px";
+}
 
-        if (item.type.startsWith("image/")) {
 
-            const file = item.getAsFile();
+subtitleSizeInput.addEventListener("input", updateSubtitleFontSize);
+window.addEventListener("resize", updateSubtitleFontSize);
 
-            loadBackground(file);
+// Image upload & drag & drop
+function setPreviewImageFromFile(file) {
+  if (!file || !file.type.startsWith("image/")) return;
 
-            break;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    previewImage.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-        }
-
-    }
-
+imageUploadInput.addEventListener("change", (event) => {
+  const file = event.target.files && event.target.files[0];
+  setPreviewImageFromFile(file);
 });
 
-// =====================================
-// Double Click Preview
-// Removes Background
-// =====================================
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
 
-preview.addEventListener("dblclick", removeBackground);
-
-// =====================================
-// Keyboard Shortcut
-// Ctrl + R = Reset
-// =====================================
-
-window.addEventListener("keydown", function (e) {
-
-    if (e.ctrlKey && e.key.toLowerCase() === "r") {
-
-        e.preventDefault();
-
-        resetDefaults();
-
-    }
-
+["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+  previewFrame.addEventListener(eventName, preventDefaults);
+  dropOverlay.addEventListener(eventName, preventDefaults);
 });
 
-// =====================================
-// Initial State
-// =====================================
+["dragenter", "dragover"].forEach((eventName) => {
+  previewFrame.addEventListener(eventName, () => {
+    dropOverlay.style.display = "flex";
+  });
+});
 
-refresh();
+["dragleave", "drop"].forEach((eventName) => {
+  previewFrame.addEventListener(eventName, () => {
+    dropOverlay.style.display = "none";
+  });
+});
 
-console.log(
-    "Subtitle Preview loaded successfully."
-);
+dropOverlay.addEventListener("drop", (event) => {
+  const dt = event.dataTransfer;
+  const file = dt && dt.files && dt.files[0];
+  setPreviewImageFromFile(file);
+});
+
+resetImageBtn.addEventListener("click", () => {
+  previewImage.src = DEFAULT_IMAGE_SRC;
+  imageUploadInput.value = "";
+});
+
+// Share link
+function buildShareUrl() {
+  const url = new URL(window.location.href);
+  url.search = "";
+
+  url.searchParams.set("text", textInput.value || "");
+  url.searchParams.set("font", fontSelect.value || "");
+  url.searchParams.set("color", fontColorInput.value || "");
+  url.searchParams.set("size", subtitleSizeInput.value || "");
+  url.searchParams.set("mode", "preview")
+
+  return url.toString();
+}
+
+async function copyShareLink() {
+  const shareUrl = buildShareUrl();
+
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    shareStatus.textContent = "Share link copied to clipboard.";
+  } catch (err) {
+    shareStatus.textContent = "Copy failed. URL: " + shareUrl;
+  }
+
+  setTimeout(() => {
+    shareStatus.textContent = "";
+  }, 4000);
+}
+
+shareBtn.addEventListener("click", () => {
+  copyShareLink();
+});
+
+// Restore from URL
+function restoreStateFromUrl() {
+  const url = new URL(window.location.href);
+  const params = url.searchParams;
+
+  const text = params.get("text");
+  const font = params.get("font");
+  const color = params.get("color");
+  const size = params.get("size");
+  const mode = params.get("mode");
+
+  if (text !== null) {
+    textInput.value = text;
+    updateSubtitleText(text);
+  }
+
+  if (font !== null) {
+    fontSelect.value = font;
+    updateSubtitleFontFamily(font);
+  }
+
+  if (color !== null) {
+    fontColorInput.value = color;
+    updateSubtitleFontColor(color);
+  }
+
+  if (size !== null) {
+    subtitleSizeInput.value = size;
+  }
+
+  if (text !== null || font !== null || color !== null || size !== null || mode !== null) {
+    showEditor();
+  }
+
+  if (mode === "preview") {
+    enablePreviewMode();
+  } else {
+    disablePreviewMode();
+  }
+}
+
+// Preview mode
+function enablePreviewMode() {
+  controlsSection.classList.add("hidden");
+  floatingEditBtn.style.display = "block";
+}
+
+function disablePreviewMode() {
+  controlsSection.classList.remove("hidden");
+  floatingEditBtn.style.display = "none";
+}
+
+floatingEditBtn.addEventListener("click", () => {
+  disablePreviewMode();
+  const url = new URL(window.location.href);
+  url.searchParams.delete("mode");
+  window.history.replaceState({}, "", url.toString());
+});
+
+// Init
+window.addEventListener("load", () => {
+    restoreStateFromUrl();
+  updateSubtitleText(textInput.value);
+  updateSubtitleFontFamily(fontSelect.value);
+  updateSubtitleFontColor(fontColorInput.value);
+});
