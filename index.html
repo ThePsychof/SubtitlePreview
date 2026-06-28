@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtitle Preview</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>🎬 Subtitle Preview</h1>
+    </header>
+
+    <main>
+
+        <!-- LEFT PANEL -->
+
+        <section class="controls">
+
+            <h2>Subtitle Settings</h2>
+
+            <div class="group">
+
+                <label for="subtitleText">Subtitle Text</label>
+
+                <textarea id="subtitleText" rows="4">
+                This is what your subtitle will look like.
+                </textarea>
+
+            </div>
+
+            <div class="group">
+
+                <label for="fontFamily">Font Family</label>
+
+                <select id="fontFamily">
+
+                    <option>Arial</option>
+                    <option>Verdana</option>
+                    <option>Tahoma</option>
+                    <option>Trebuchet MS</option>
+                    <option>Georgia</option>
+                    <option>Times New Roman</option>
+                    <option>Courier New</option>
+
+                </select>
+
+            </div>
+
+            <div class="group">
+
+                <label for="fontSize">
+                    Font Size:
+                    <span id="fontSizeValue">22 px</span>
+                </label>
+
+                <input
+                    type="range"
+                    id="fontSize"
+                    min="10"
+                    max="80"
+                    value="22">
+
+            </div>
+
+            <div class="group">
+
+                <label for="fontColor">Subtitle Color</label>
+
+                <input
+                    type="color"
+                    id="fontColor"
+                    value="#ffff00">
+
+            </div>
+
+            <hr>
+
+            <h2>Background</h2>
+
+            <div class="group">
+
+                <label for="backgroundUpload">Upload Movie Frame</label>
+
+                <input
+                    type="file"
+                    id="backgroundUpload"
+                    accept="image/*">
+
+            </div>
+
+            <button id="resetBackground">
+                Remove Background
+            </button>
+
+        </section>
+
+        <!-- RIGHT PANEL -->
+
+        <section class="previewSection">
+
+            <div id="preview">
+
+                <div id="subtitle">
+                    This is what your subtitle will look like.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

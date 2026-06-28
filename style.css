@@ -1,0 +1,341 @@
+/* ==========================
+   Global
+========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial, Helvetica, sans-serif;
+
+    background:#121212;
+
+    color:white;
+
+    min-height:100vh;
+
+}
+
+/* ==========================
+   Layout
+========================== */
+
+.container{
+
+    width:min(1400px,95%);
+
+    margin:30px auto;
+
+}
+
+header{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+header h1{
+
+    font-size:2.2rem;
+
+    margin-bottom:8px;
+
+}
+
+header p{
+
+    color:#bbbbbb;
+
+}
+
+main{
+
+    display:flex;
+
+    gap:30px;
+
+    align-items:flex-start;
+
+    flex-wrap:wrap;
+
+}
+
+/* ==========================
+   Left Panel
+========================== */
+
+.controls{
+
+    flex:1;
+
+    min-width:320px;
+
+    background:#1d1d1d;
+
+    padding:25px;
+
+    border-radius:16px;
+
+    border:1px solid #2c2c2c;
+
+}
+
+.controls h2{
+
+    margin-bottom:18px;
+
+}
+
+.group{
+
+    margin-bottom:24px;
+
+}
+
+.group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+}
+
+textarea{
+
+    width:100%;
+
+    resize:vertical;
+
+    min-height:100px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2a2a2a;
+
+    color:white;
+
+    font-size:16px;
+
+}
+
+textarea:focus{
+
+    outline:2px solid #3d84ff;
+
+}
+
+select{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2a2a2a;
+
+    color:white;
+
+    font-size:16px;
+
+}
+
+input[type="range"]{
+
+    width:100%;
+
+}
+
+input[type="color"]{
+
+    width:70px;
+
+    height:42px;
+
+    border:none;
+
+    cursor:pointer;
+
+    background:none;
+
+}
+
+input[type="file"]{
+
+    width:100%;
+
+}
+
+button{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    background:#2f2f2f;
+
+    color:white;
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    background:#444;
+
+}
+
+hr{
+
+    border:none;
+
+    height:1px;
+
+    background:#333;
+
+    margin:25px 0;
+
+}
+
+/* ==========================
+   Preview Area
+========================== */
+
+.previewSection{
+
+    flex:2;
+
+    min-width:500px;
+
+}
+
+#preview{
+
+    width:100%;
+
+    aspect-ratio:16/9;
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+    border:2px solid #303030;
+
+    background:#000;
+
+    background-size:cover;
+
+    background-position:center;
+
+    background-repeat:no-repeat;
+
+}
+
+/* subtle overlay */
+
+#preview::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:linear-gradient(
+        rgba(0,0,0,.08),
+        rgba(0,0,0,.18)
+    );
+
+    pointer-events:none;
+
+}
+
+/* ==========================
+   Subtitle
+========================== */
+
+#subtitle{
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:8%;
+
+    transform:translateX(-50%);
+
+    width:90%;
+
+    text-align:center;
+
+    color:yellow;
+
+    font-size:22px;
+
+    font-family:Arial;
+
+    line-height:1.35;
+
+    word-break:break-word;
+
+    text-shadow:
+        -2px -2px 0 black,
+         2px -2px 0 black,
+        -2px  2px 0 black,
+         2px  2px 0 black,
+         0px 3px 4px black;
+
+    z-index:2;
+
+}
+
+/* ==========================
+   Responsive
+========================== */
+
+@media (max-width:950px){
+
+main{
+
+    flex-direction:column;
+
+}
+
+.previewSection{
+
+    width:100%;
+
+}
+
+.controls{
+
+    width:100%;
+
+}
+
+}
