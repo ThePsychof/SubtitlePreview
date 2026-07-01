@@ -162,6 +162,7 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  touch-action: manipulation;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.08s ease;
 }
@@ -190,6 +191,7 @@ body {
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+  touch-action: manipulation;
   transition: transform 260ms ease, opacity 260ms ease, border-radius 260ms ease, box-shadow 260ms ease;
 }
 
@@ -231,11 +233,19 @@ body.cinema-preview-active .floating-edit-btn {
 }
 
 body.cinema-preview-active .preview-frame-wrapper {
-  width: min(92vw, calc(92vh * 16 / 9));
-  height: min(92vh, calc(92vw * 9 / 16));
+  width: min(94vw, calc(94vh * 16 / 9));
+  height: min(94vh, calc(94vw * 9 / 16));
   max-width: 100%;
   max-height: 100%;
   margin: 0;
+}
+
+@media (max-width: 767px) {
+  body.cinema-preview-active .preview-frame-wrapper {
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(100vh, calc(100vw * 9 / 16));
+    padding: 0;
+  }
 }
 
 body.cinema-preview-active .preview-frame {
@@ -459,6 +469,34 @@ select:focus-visible {
 }
 
 /* Responsive */
+@media (max-width: 767px) {
+  .preview-section {
+    gap: 0.75rem;
+  }
+
+  .cinema-preview-btn {
+    top: auto;
+    right: 0.75rem;
+    top: calc(0.75rem + env(safe-area-inset-bottom));
+    padding: 0.7rem 0.95rem;
+    font-size: 0.95rem;
+    border-radius: 999px;
+  }
+
+  .image-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .image-upload-label {
+    width: 100%;
+  }
+
+  .preview-frame {
+    border-radius: 0.8rem;
+  }
+}
+
 @media (min-width: 768px) {
   .landing {
     padding-top: 2.5rem;

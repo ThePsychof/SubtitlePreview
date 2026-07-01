@@ -40,6 +40,7 @@ let previewResizeObserver = null;
 let isCinemaPreviewActive = false;
 let cinemaOrientationLocked = false;
 let cinemaFullscreenRequested = false;
+let cinemaPreviewInteractionLocked = false;
 let previousBodyOverflow = "";
 let previousHtmlOverflow = "";
 
@@ -431,6 +432,15 @@ function setCinemaPreviewButtonState() {
   }
 }
 
+function refreshPreviewAfterLayoutChange() {
+  requestAnimationFrame(() => {
+    if (subtitleRenderer && typeof subtitleRenderer.resize === "function") {
+      subtitleRenderer.resize();
+    }
+    updateSubtitlePreview();
+  });
+}
+
 function applyCinemaPreviewState(active) {
   document.body.classList.toggle("cinema-preview-active", active);
   if (previewSection) {
@@ -446,6 +456,8 @@ function applyCinemaPreviewState(active) {
     document.body.style.overflow = previousBodyOverflow;
     document.documentElement.style.overflow = previousHtmlOverflow;
   }
+
+  refreshPreviewAfterLayoutChange();
 }
 
 async function enterCinemaPreview(event) {
@@ -460,9 +472,10 @@ async function enterCinemaPreview(event) {
     previewFrame.focus({ preventScroll: true });
   }
 
-  if (document.fullscreenEnabled) {
+  const fullscreenTarget = previewSection || editorSection || document.documentElement;
+  if (fullscreenTarget && typeof fullscreenTarget.requestFullscreen === "function" && document.fullscreenEnabled) {
     try {
-      await document.documentElement.requestFullscreen();
+      await fullscreenTarget.requestFullscreen();
       cinemaFullscreenRequested = true;
     } catch (err) {
       // Ignore fullscreen errors and continue.
@@ -523,16 +536,31 @@ function handleCinemaPreviewKeydown(event) {
   }
 }
 
-function handleCinemaPreviewClick(event) {
-  if (isCinemaPreviewActive) {
-    const pointerIsCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-    if (pointerIsCoarse) {
-      event.preventDefault();
-      exitCinemaPreview(event);
-    }
+function handleCinemaPreviewInteraction(event) {
+  if (event.type === "click" && event.detail > 1) {
     return;
   }
 
+  if (cinemaPreviewInteractionLocked) {
+    return;
+  }
+
+  cinemaPreviewInteractionLocked = true;
+  window.setTimeout(() => {
+    cinemaPreviewInteractionLocked = false;
+  }, 280);
+
+  if (event.pointerType === "mouse" && event.button !== 0) {
+    return;
+  }
+
+  if (isCinemaPreviewActive) {
+    event.preventDefault();
+    exitCinemaPreview(event);
+    return;
+  }
+
+  event.preventDefault();
   enterCinemaPreview(event);
 }
 
@@ -566,7 +594,9 @@ floatingEditBtn.addEventListener("click", () => {
 });
 
 if (previewFrame) {
-  previewFrame.addEventListener("click", handleCinemaPreviewClick);
+  ["click", "touchend", "pointerup"].forEach((eventName) => {
+    previewFrame.addEventListener(eventName, handleCinemaPreviewInteraction);
+  });
   previewFrame.addEventListener("dblclick", (event) => {
     if (isCinemaPreviewActive) {
       event.preventDefault();
@@ -577,12 +607,8 @@ if (previewFrame) {
 }
 
 if (cinemaPreviewBtn) {
-  cinemaPreviewBtn.addEventListener("click", (event) => {
-    if (isCinemaPreviewActive) {
-      exitCinemaPreview(event);
-    } else {
-      enterCinemaPreview(event);
-    }
+  ["click", "touchend", "pointerup"].forEach((eventName) => {
+    cinemaPreviewBtn.addEventListener(eventName, handleCinemaPreviewInteraction);
   });
 }
 
