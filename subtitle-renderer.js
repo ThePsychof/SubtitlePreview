@@ -179,7 +179,7 @@
       const context = canvasElement.getContext("2d");
       if (!context) return;
 
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, size.width, size.height);
 
@@ -192,20 +192,24 @@
     }
 
     function syncCanvasSize() {
-      if (!canvasElement) return { width: 0, height: 0 };
+      if (!canvasElement) return { width: 0, height: 0, pixelWidth: 0, pixelHeight: 0, dpr: 1 };
 
       const container = canvasElement.parentElement || canvasElement;
       const rect = container.getBoundingClientRect();
       const width = Math.max(1, Math.round(rect.width || container.clientWidth || canvasElement.clientWidth || 1280));
       const height = Math.max(1, Math.round(rect.height || container.clientHeight || canvasElement.clientHeight || 720));
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const pixelWidth = Math.round(width * dpr);
+      const pixelHeight = Math.round(height * dpr);
 
-      canvasElement.width = Math.round(width * dpr);
-      canvasElement.height = Math.round(height * dpr);
+      if (canvasElement.width !== pixelWidth || canvasElement.height !== pixelHeight) {
+        canvasElement.width = pixelWidth;
+        canvasElement.height = pixelHeight;
+      }
       canvasElement.style.width = "100%";
       canvasElement.style.height = "100%";
 
-      return { width, height };
+      return { width, height, pixelWidth, pixelHeight, dpr };
     }
 
     function applyConfig(config) {
@@ -222,7 +226,7 @@
       const size = syncCanvasSize();
       const context = canvasElement && canvasElement.getContext("2d");
       if (context) {
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         context.clearRect(0, 0, size.width, size.height);
       }
@@ -237,8 +241,8 @@
 
       const assDocument = buildAssDocument({
         ...resolvedConfig,
-        width: size.width,
-        height: size.height
+        width: size.pixelWidth || size.width,
+        height: size.pixelHeight || size.height
       });
 
       if (typeof rendererState.instance.setTrack === "function") {
@@ -285,10 +289,11 @@
             return;
           }
 
+          const size = syncCanvasSize();
           const assDocument = buildAssDocument({
             ...config,
-            width: canvasElement.clientWidth || 1280,
-            height: canvasElement.clientHeight || 720
+            width: size.pixelWidth || size.width || 1280,
+            height: size.pixelHeight || size.height || 720
           });
 
           const workerUrl = resolveAssetUrl(settings.workerUrl || DEFAULT_WORKER_URL);

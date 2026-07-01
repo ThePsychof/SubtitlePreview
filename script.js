@@ -45,7 +45,7 @@ function renderSubtitleToCanvas(state) {
   const rect = subtitleCanvas.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width || subtitleCanvas.clientWidth || previewFrame?.clientWidth || 640));
   const height = Math.max(1, Math.round(rect.height || subtitleCanvas.clientHeight || previewFrame?.clientHeight || 360));
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
   const pixelWidth = Math.round(width * dpr);
   const pixelHeight = Math.round(height * dpr);
 
