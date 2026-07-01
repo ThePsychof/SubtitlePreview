@@ -120,6 +120,10 @@
     return new URL(String(url), window.location.href).toString();
   }
 
+  function getCanvasPixelRatio() {
+    return Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+  }
+
   function buildAssDocument(config) {
     const width = Math.max(1, config.width || 1280);
     const height = Math.max(1, config.height || 720);
@@ -179,7 +183,7 @@
       const context = canvasElement.getContext("2d");
       if (!context) return;
 
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const dpr = getCanvasPixelRatio();
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, size.width, size.height);
 
@@ -198,7 +202,7 @@
       const rect = container.getBoundingClientRect();
       const width = Math.max(1, Math.round(rect.width || container.clientWidth || canvasElement.clientWidth || 1280));
       const height = Math.max(1, Math.round(rect.height || container.clientHeight || canvasElement.clientHeight || 720));
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const dpr = getCanvasPixelRatio();
       const pixelWidth = Math.round(width * dpr);
       const pixelHeight = Math.round(height * dpr);
 
@@ -226,7 +230,7 @@
       const size = syncCanvasSize();
       const context = canvasElement && canvasElement.getContext("2d");
       if (context) {
-        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const dpr = getCanvasPixelRatio();
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         context.clearRect(0, 0, size.width, size.height);
       }
@@ -241,8 +245,8 @@
 
       const assDocument = buildAssDocument({
         ...resolvedConfig,
-        width: size.pixelWidth || size.width,
-        height: size.pixelHeight || size.height
+        width: size.width,
+        height: size.height
       });
 
       if (typeof rendererState.instance.setTrack === "function") {
@@ -292,8 +296,8 @@
           const size = syncCanvasSize();
           const assDocument = buildAssDocument({
             ...config,
-            width: size.pixelWidth || size.width || 1280,
-            height: size.pixelHeight || size.height || 720
+            width: size.width || 1280,
+            height: size.height || 720
           });
 
           const workerUrl = resolveAssetUrl(settings.workerUrl || DEFAULT_WORKER_URL);
