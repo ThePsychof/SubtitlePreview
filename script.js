@@ -29,12 +29,19 @@ const opaqueBoxInput = document.getElementById("opaqueBox");
 const shareBtn = document.getElementById("shareBtn");
 const shareStatus = document.getElementById("shareStatus");
 const floatingEditBtn = document.getElementById("floatingEditBtn");
+const previewSection = document.querySelector(".preview-section");
+const cinemaPreviewBtn = document.getElementById("cinemaPreviewBtn");
 
 const DEFAULT_IMAGE_SRC = "assets/movie-default.jpg";
 const BASE_PREVIEW_HEIGHT = 450;
 
 let subtitleRenderer = null;
 let previewResizeObserver = null;
+let isCinemaPreviewActive = false;
+let cinemaOrientationLocked = false;
+let cinemaFullscreenRequested = false;
+let previousBodyOverflow = "";
+let previousHtmlOverflow = "";
 
 function renderSubtitleToCanvas(state) {
   if (!subtitleCanvas) return;
@@ -45,7 +52,7 @@ function renderSubtitleToCanvas(state) {
   const rect = subtitleCanvas.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width || subtitleCanvas.clientWidth || previewFrame?.clientWidth || 640));
   const height = Math.max(1, Math.round(rect.height || subtitleCanvas.clientHeight || previewFrame?.clientHeight || 360));
-  const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
   const pixelWidth = Math.round(width * dpr);
   const pixelHeight = Math.round(height * dpr);
 
@@ -412,6 +419,134 @@ function restoreStateFromUrl() {
   }
 }
 
+function setCinemaPreviewButtonState() {
+  if (!cinemaPreviewBtn) return;
+
+  const label = cinemaPreviewBtn.querySelector(".cinema-preview-label");
+  cinemaPreviewBtn.setAttribute("aria-pressed", isCinemaPreviewActive ? "true" : "false");
+  cinemaPreviewBtn.setAttribute("aria-label", isCinemaPreviewActive ? "Exit cinema preview" : "Enter cinema preview");
+
+  if (label) {
+    label.textContent = isCinemaPreviewActive ? "Exit Cinema Preview" : "Cinema Preview";
+  }
+}
+
+function applyCinemaPreviewState(active) {
+  document.body.classList.toggle("cinema-preview-active", active);
+  if (previewSection) {
+    previewSection.classList.toggle("is-active", active);
+  }
+
+  if (active) {
+    previousBodyOverflow = document.body.style.overflow;
+    previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = previousBodyOverflow;
+    document.documentElement.style.overflow = previousHtmlOverflow;
+  }
+}
+
+async function enterCinemaPreview(event) {
+  if (isCinemaPreviewActive) return;
+
+  isCinemaPreviewActive = true;
+  cinemaFullscreenRequested = false;
+  applyCinemaPreviewState(true);
+  setCinemaPreviewButtonState();
+
+  if (previewFrame) {
+    previewFrame.focus({ preventScroll: true });
+  }
+
+  if (document.fullscreenEnabled) {
+    try {
+      await document.documentElement.requestFullscreen();
+      cinemaFullscreenRequested = true;
+    } catch (err) {
+      // Ignore fullscreen errors and continue.
+    }
+  }
+
+  if (screen.orientation && typeof screen.orientation.lock === "function") {
+    try {
+      await screen.orientation.lock("landscape");
+      cinemaOrientationLocked = true;
+    } catch (err) {
+      cinemaOrientationLocked = false;
+    }
+  }
+
+  if (event && typeof event.preventDefault === "function") {
+    event.preventDefault();
+  }
+}
+
+function exitCinemaPreview(event) {
+  if (!isCinemaPreviewActive) return;
+
+  isCinemaPreviewActive = false;
+  applyCinemaPreviewState(false);
+  setCinemaPreviewButtonState();
+  cinemaFullscreenRequested = false;
+
+  if (document.fullscreenElement && document.exitFullscreen) {
+    try {
+      document.exitFullscreen();
+    } catch (err) {
+      // Ignore fullscreen errors.
+    }
+  }
+
+  if (cinemaOrientationLocked && screen.orientation && typeof screen.orientation.unlock === "function") {
+    try {
+      screen.orientation.unlock();
+    } catch (err) {
+      // Ignore orientation unlock errors.
+    }
+  }
+
+  cinemaOrientationLocked = false;
+
+  if (event && typeof event.preventDefault === "function") {
+    event.preventDefault();
+  }
+}
+
+function handleCinemaPreviewKeydown(event) {
+  if (!isCinemaPreviewActive) return;
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    exitCinemaPreview(event);
+  }
+}
+
+function handleCinemaPreviewClick(event) {
+  if (isCinemaPreviewActive) {
+    const pointerIsCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (pointerIsCoarse) {
+      event.preventDefault();
+      exitCinemaPreview(event);
+    }
+    return;
+  }
+
+  enterCinemaPreview(event);
+}
+
+function handleCinemaPreviewKeypress(event) {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    if (isCinemaPreviewActive) {
+      exitCinemaPreview(event);
+    } else {
+      enterCinemaPreview(event);
+    }
+  }
+}
+
 // Preview mode
 function enablePreviewMode() {
   controlsSection.classList.add("hidden");
@@ -430,6 +565,35 @@ floatingEditBtn.addEventListener("click", () => {
   window.history.replaceState({}, "", url.toString());
 });
 
+if (previewFrame) {
+  previewFrame.addEventListener("click", handleCinemaPreviewClick);
+  previewFrame.addEventListener("dblclick", (event) => {
+    if (isCinemaPreviewActive) {
+      event.preventDefault();
+      exitCinemaPreview(event);
+    }
+  });
+  previewFrame.addEventListener("keydown", handleCinemaPreviewKeypress);
+}
+
+if (cinemaPreviewBtn) {
+  cinemaPreviewBtn.addEventListener("click", (event) => {
+    if (isCinemaPreviewActive) {
+      exitCinemaPreview(event);
+    } else {
+      enterCinemaPreview(event);
+    }
+  });
+}
+
+document.addEventListener("keydown", handleCinemaPreviewKeydown);
+
+document.addEventListener("fullscreenchange", () => {
+  if (isCinemaPreviewActive && cinemaFullscreenRequested && !document.fullscreenElement) {
+    exitCinemaPreview();
+  }
+});
+
 // Init
 window.renderSubtitleToCanvas = renderSubtitleToCanvas;
 window.updateSubtitlePreview = updateSubtitlePreview;
@@ -439,6 +603,7 @@ window.getControlState = getControlState;
 window.addEventListener("load", () => {
   restoreStateFromUrl();
   observePreviewResize();
+  setCinemaPreviewButtonState();
   updateSubtitleText(textInput.value, getControlState());
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {

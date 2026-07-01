@@ -39,7 +39,17 @@
       <!-- Preview -->
       <section class="preview-section">
         <div class="preview-frame-wrapper">
-          <div class="preview-frame" id="previewFrame" aria-label="Movie frame preview">
+          <button
+            type="button"
+            class="cinema-preview-btn"
+            id="cinemaPreviewBtn"
+            aria-label="Enter cinema preview"
+            aria-pressed="false"
+          >
+            <span class="cinema-preview-icon" aria-hidden="true">⛶</span>
+            <span class="cinema-preview-label">Cinema Preview</span>
+          </button>
+          <div class="preview-frame" id="previewFrame" role="button" tabindex="0" aria-label="Movie frame preview">
             <img
               src="assets/movie-default.jpg"
               alt="Default movie frame"

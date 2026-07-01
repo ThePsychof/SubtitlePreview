@@ -120,10 +120,6 @@
     return new URL(String(url), window.location.href).toString();
   }
 
-  function getCanvasPixelRatio() {
-    return Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
-  }
-
   function buildAssDocument(config) {
     const width = Math.max(1, config.width || 1280);
     const height = Math.max(1, config.height || 720);
@@ -183,7 +179,7 @@
       const context = canvasElement.getContext("2d");
       if (!context) return;
 
-      const dpr = getCanvasPixelRatio();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, size.width, size.height);
 
@@ -196,24 +192,20 @@
     }
 
     function syncCanvasSize() {
-      if (!canvasElement) return { width: 0, height: 0, pixelWidth: 0, pixelHeight: 0, dpr: 1 };
+      if (!canvasElement) return { width: 0, height: 0 };
 
       const container = canvasElement.parentElement || canvasElement;
       const rect = container.getBoundingClientRect();
       const width = Math.max(1, Math.round(rect.width || container.clientWidth || canvasElement.clientWidth || 1280));
       const height = Math.max(1, Math.round(rect.height || container.clientHeight || canvasElement.clientHeight || 720));
-      const dpr = getCanvasPixelRatio();
-      const pixelWidth = Math.round(width * dpr);
-      const pixelHeight = Math.round(height * dpr);
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
 
-      if (canvasElement.width !== pixelWidth || canvasElement.height !== pixelHeight) {
-        canvasElement.width = pixelWidth;
-        canvasElement.height = pixelHeight;
-      }
+      canvasElement.width = Math.round(width * dpr);
+      canvasElement.height = Math.round(height * dpr);
       canvasElement.style.width = "100%";
       canvasElement.style.height = "100%";
 
-      return { width, height, pixelWidth, pixelHeight, dpr };
+      return { width, height };
     }
 
     function applyConfig(config) {
@@ -230,7 +222,7 @@
       const size = syncCanvasSize();
       const context = canvasElement && canvasElement.getContext("2d");
       if (context) {
-        const dpr = getCanvasPixelRatio();
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         context.clearRect(0, 0, size.width, size.height);
       }
