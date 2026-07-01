@@ -48,4 +48,6 @@ https://thepsychof.github.io/SubtitlePreview/
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 Licence. see the [LICENSE](LICENSE) file for details.
+This project’s source code is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+
+The bundled third-party subtitle rendering assets under [assets/libass](assets/libass) include their own upstream license notices and remain subject to those licenses.

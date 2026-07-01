@@ -165,34 +165,48 @@ body {
 
 .subtitle-overlay {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 5%;
-  padding: 0 6%;
-  display: flex;
-  justify-content: center;
+  inset: 0;
+  display: block;
+  padding: 0;
   pointer-events: none;
 }
 
+.subtitle-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 2;
+  background: transparent;
+  opacity: 1;
+  visibility: visible;
+}
+
 .subtitle-text {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   margin: 0;
-  max-width: 100%;
+  max-width: min(90%, 900px);
   text-align: center;
-  color: #ffffff;
-  transition: 
-    font-size .15s ease,
-    color .15s ease
-    font-family .15s ease;
-  text-shadow:
-    -2px -2px 0 #000000,
-    2px -2px 0 #000000,
-    -2px 2px 0 #000000,
-    2px 2px 0 #000000,
-    2px 2px 0 #000000,
-    0 2px 4px rgba(0, 0, 0, 0.8);
   word-wrap: break-word;
+  display: inline-block;
+  visibility: visible;
+  opacity: 1;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+}
+
+.subtitle-text.is-fallback {
+  display: inline-block;
 }
 
 /* Drag & drop overlay */
@@ -385,4 +399,35 @@ select:focus-visible {
 /* Utility */
 .hidden {
   display: none !important;
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.colors label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+.colors input[type="color"] {
+  cursor: pointer;
+  border: none;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
 }
