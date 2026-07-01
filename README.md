@@ -32,7 +32,7 @@ SubtitlePreview lets both sides see the subtitle style instantly before renderin
 
 ---
 
-## Live Demo
+## Live
 
 https://thepsychof.github.io/SubtitlePreview/
 
